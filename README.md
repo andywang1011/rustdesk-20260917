@@ -1,4 +1,4 @@
-# rustdesk-20260917
+# rustdesk-workflows
 
 基于 GitHub Actions 编译的自定义 RustDesk Windows 客户端。
 

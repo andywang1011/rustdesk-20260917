@@ -1,49 +1,44 @@
 # rustdesk-20260917
 
-Custom RustDesk Windows client build, compiled on GitHub Actions.
+基于 GitHub Actions 编译的自定义 RustDesk Windows 客户端。
 
-## Build config
+## 构建配置
 
-No connection values are kept in this repository. Every value is stored as an
-encrypted **GitHub Secret** and read by the workflow only at build time:
+本仓库不保存任何连接配置。所有值均以加密的 **GitHub Secrets** 存储，仅在构建时由工作流读取：
 
-| Secret | Purpose |
+| Secret | 用途 |
 | --- | --- |
-| `ID_SERVER` | ID / rendezvous server |
-| `RELAY_SERVER` | Relay server |
-| `API_SERVER` | API server (optional) |
-| `PUBLIC_KEY` | Server public key (optional) |
-| `FIXED_PASSWORD` | Fixed unattended-access password (optional) |
+| `ID_SERVER` | ID / 信令服务器 |
+| `RELAY_SERVER` | 中继服务器 |
+| `API_SERVER` | API 服务器（可选） |
+| `PUBLIC_KEY` | 服务器公钥（可选） |
+| `FIXED_PASSWORD` | 固定无人值守密码（可选） |
 
-`Source` builds against upstream `rustdesk/rustdesk` (master). The compiled
-client connects to the configured server with the fixed password.
+源码基于上游 `rustdesk/rustdesk`（master）构建，编译后的客户端使用上述固定密码连接指定服务器。
 
-## Customized default settings
+## 自定义默认设置
 
-The "Patch RustDesk custom config" step in
-`.github/workflows/build-rustdesk-windows.yml` also patches
-`libs/hbb_common/src/config.rs` so a freshly installed client starts with:
+工作流中的 "Patch RustDesk custom config" 步骤会在构建时修改
+`libs/hbb_common/src/config.rs`，使新安装的客户端默认启用以下设置：
 
-| Setting | Option key | Injected default |
+| 设置项 | 选项键 | 默认值 |
 | --- | --- | --- |
-| 常规-启动时检查软件更新 (check updates on start) | `enable-check-update` | `N` (unchecked) |
-| 常规-启用UDP打洞 (UDP hole punching) | `enable-udp-punch` | `Y` (enabled) |
-| 安全-拒绝局域网发现 (deny LAN discovery) | `enable-lan-discovery` | `N` (denied) |
-| 安全-允许远程修改配置 (allow remote config modification) | `allow-remote-config-modification` | `Y` (allowed) |
+| 常规-启动时检查软件更新 | `enable-check-update` | `N`（不打勾） |
+| 常规-启用UDP打洞 | `enable-udp-punch` | `Y`（打勾） |
+| 安全-拒绝局域网发现 | `enable-lan-discovery` | `N`（打勾） |
+| 安全-允许远程修改配置 | `allow-remote-config-modification` | `Y`（打勾） |
 
-- The first two are injected into `LocalConfig::load()` (file `_local`), the
-  last two into `Config2::load()` (file `"2"`) — the same places the app reads
-  these options from (`LocalConfig::get_option`, `Config::get_option`).
-- Each value is written only when the key is **absent** (a `contains_key`
-  guard), so an existing user setting is never overwritten.
-- `enable-lan-discovery = "N"` is the deny-LAN-discovery state: the UI shows
-  the checkbox as `_denyLANDiscovery = !option2bool("enable-lan-discovery", …)`.
-- `allow-remote-config-modification = "Y"` means "allowed" (checkbox checked).
+- 前两项注入 `LocalConfig::load()`（文件 `_local`），后两项注入
+  `Config2::load()`（文件 `"2"`），与应用读取这些选项的位置一致
+  （`LocalConfig::get_option`、`Config::get_option`）。
+- 仅在对应键**不存在**时写入（`contains_key` 保护），不会覆盖用户已有设置。
+- `enable-lan-discovery = "N"` 即"拒绝局域网发现"打勾状态：界面通过
+  `_denyLANDiscovery = !option2bool("enable-lan-discovery", …)` 取反显示。
+- `allow-remote-config-modification = "Y"` 表示"允许"（打勾）。
 
-## Build
+## 构建
 
-The workflow is **manual only** (`workflow_dispatch`) — pushing to `main`
-does not start a build. Run `.github/workflows/build-rustdesk-windows.yml`
-from the **Actions** tab when a new client is needed; it builds a portable
-Windows client in two jobs (`generate-bridge` → `build-windows`). The `.exe`
-artifacts appear under the triggering run.
+工作流为**手动触发**（`workflow_dispatch`），推送到 `main` 不会自动构建。
+需要新客户端时，在仓库 **Actions** 页手动运行 `Build RustDesk Windows`；
+工作流包含两个作业（`generate-bridge` → `build-windows`），产物 `.exe`
+在对应运行记录的工件（Artifacts）中下载。

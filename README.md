@@ -42,7 +42,8 @@ The "Patch RustDesk custom config" step in
 
 ## Build
 
-Pushing to `main` or running the workflow manually (`workflow_dispatch`)
-triggers `.github/workflows/build-rustdesk-windows.yml`, which builds a
-portable Windows client in two jobs (`generate-bridge` → `build-windows`).
-The `.exe` artifacts appear under the **Actions** tab of the triggering run.
+The workflow is **manual only** (`workflow_dispatch`) — pushing to `main`
+does not start a build. Run `.github/workflows/build-rustdesk-windows.yml`
+from the **Actions** tab when a new client is needed; it builds a portable
+Windows client in two jobs (`generate-bridge` → `build-windows`). The `.exe`
+artifacts appear under the triggering run.

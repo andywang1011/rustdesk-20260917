@@ -42,3 +42,7 @@
 需要新客户端时，在仓库 **Actions** 页手动运行 `Build RustDesk Windows`；
 工作流包含两个作业（`generate-bridge` → `build-windows`），产物 `.exe`
 在对应运行记录的工件（Artifacts）中下载。
+
+## 参考文档
+
+- [客户端修改参考.md](./客户端修改参考.md)：客户端全部源码定制项（服务器/账号、界面精简、首页 Logo、默认设置、安全密码）的整理说明。
